@@ -34,7 +34,7 @@ class ExamActivity : AppCompatActivity() {
     private var countdownTimer: CountDownTimer? = null
     private var isTimerRunning = false
     private var remainingTimeInMillis: Long = 0
-    private val countdownDurationInMillis: Long = 60000
+    private val countdownDurationInMillis: Long = 10000
     private lateinit var notificationManager: NotificationManager
 
     var checkOnOff=true
@@ -96,6 +96,7 @@ class ExamActivity : AppCompatActivity() {
                 if (checkOnOff) {
                     checkOnOff = false
                     // DND off
+                    stopCountdown()
                     notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL)
                 } else {
                     checkOnOff = true
@@ -201,10 +202,11 @@ class ExamActivity : AppCompatActivity() {
 
         AlertDialog.Builder(this)
             .setTitle("Perhatian !")
-            .setMessage("Wwaktu Habis Silakan Keluar Aplikasi ?")
-            .setPositiveButton("Ya"){ dialogInterface: DialogInterface, i: Int ->
+            .setMessage("Waktu Habis Silakan Keluar Aplikasi ?")
+            .setPositiveButton("Ya"){ dialogInterface: DialogInterface, _: Int ->
                 startActivity(Intent(this, InputTokenActivity::class.java))
-                finish()
+                finishAndRemoveTask()
+                dndEnable()
                 dialogInterface.dismiss()
             }
             .show()
