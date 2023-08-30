@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="3dp"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Allow Permission"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Permission is needed to activate dont disturb service so first allow ther permission."
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        />
+
+   <androidx.constraintlayout.widget.ConstraintLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="horizontal"
+       >
+       <TextView
+           android:id="@+id/_cancel"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="Cancel"
+           android:textColor="@color/primary_color"
+           android:textStyle="bold"
+           android:textSize="14dp"
+           android:padding="10dp"
+           android:background="?selectableItemBackground"
+           app:layout_constraintTop_toTopOf="parent"
+           app:layout_constraintEnd_toStartOf="@+id/_done"
+           />
+       <TextView
+           android:id="@+id/_done"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="Allow"
+           android:textColor="@color/primary_color"
+           android:textStyle="bold"
+           android:textSize="14sp"
+           android:padding="10dp"
+           android:background="?selectableItemBackground"
+           app:layout_constraintTop_toTopOf="parent"
+           app:layout_constraintEnd_toEndOf="parent"
+           />
+
+   </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

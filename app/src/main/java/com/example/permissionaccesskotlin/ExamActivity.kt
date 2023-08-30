@@ -1,18 +1,27 @@
 package com.example.permissionaccesskotlin
 
+import android.app.NotificationManager
 import android.app.ProgressDialog
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.provider.Settings
 import android.view.KeyEvent
 import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.permissionaccesskotlin.databinding.ActivityExamBinding
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import java.util.concurrent.TimeUnit
 
 class ExamActivity : AppCompatActivity() {
@@ -25,18 +34,28 @@ class ExamActivity : AppCompatActivity() {
     private var countdownTimer: CountDownTimer? = null
     private var isTimerRunning = false
     private var remainingTimeInMillis: Long = 0
-    private val countdownDurationInMillis: Long = 60000 // 1 minute
+    private val countdownDurationInMillis: Long = 60000
+    private lateinit var notificationManager: NotificationManager
+
+    var checkOnOff=true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityExamBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        this.window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
+        window.decorView.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                )
 
         AlertDialog.Builder(this)
             .setTitle("Perhatian !")
             .setMessage("Notifikasi, Layar, dan lainnya akan terkunci, ingin melanjutkan ?")
             .setPositiveButton("Ya"){ dialogInterface: DialogInterface, i: Int ->
                 startExam()
+                dndEnable()
                 dialogInterface.dismiss()
             }
             .setNegativeButton("Tidak"){ dialogInterface: DialogInterface, i: Int ->
@@ -44,6 +63,49 @@ class ExamActivity : AppCompatActivity() {
                 dialogInterface.dismiss()
             }
             .show()
+
+    }
+
+    private fun dndEnable(){
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!notificationManager.isNotificationPolicyAccessGranted) {
+                showPermissionDialog()
+            } else {
+                if (checkOnOff) {
+                    checkOnOff = false
+                    // DND off
+                    notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL)
+                } else {
+                    checkOnOff = true
+                    //DND on
+                    notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE)
+                }
+
+            }
+
+        }
+
+        dndDissable()
+    }
+    private fun dndDissable(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!notificationManager.isNotificationPolicyAccessGranted) {
+                showPermissionDialog()
+            } else {
+                if (checkOnOff) {
+                    checkOnOff = false
+                    // DND off
+                    notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL)
+                } else {
+                    checkOnOff = true
+                    // DND on
+                    notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALARMS)
+                }
+
+            }
+
+        }
     }
 
     private fun startExam(){
@@ -153,6 +215,29 @@ class ExamActivity : AppCompatActivity() {
         val seconds = TimeUnit.MILLISECONDS.toSeconds(remainingTimeInMillis - TimeUnit.MINUTES.toMillis(minutes))
         binding.tvTimer.text = String.format("%02d:%02d", minutes, seconds)
     }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun showPermissionDialog() {
+        val mDialog = BottomSheetDialog(this)
+        mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        mDialog.setCanceledOnTouchOutside(false)
+        mDialog.setContentView(R.layout.dialog_permission)
+
+        val mCancel=mDialog.findViewById<TextView>(R.id._cancel)
+        mCancel?.setOnClickListener{
+            mDialog.dismiss()
+        }
+
+        val mDone=mDialog.findViewById<TextView>(R.id._done)
+        mDone?.setOnClickListener{
+            val intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
+            startActivity(intent)
+            mDialog.dismiss()
+        }
+
+        mDialog.show()
+    }
+
 
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
