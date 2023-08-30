@@ -1,26 +1,17 @@
 package com.example.permissionaccesskotlin
 
-import android.app.KeyguardManager
 import android.app.ProgressDialog
-import android.app.admin.DevicePolicyManager
-import android.content.ComponentName
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.KeyEvent
 import android.view.View
-import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
+import androidx.appcompat.app.AppCompatActivity
 import com.example.permissionaccesskotlin.databinding.ActivityExamBinding
 import java.util.concurrent.TimeUnit
 
@@ -29,11 +20,12 @@ class ExamActivity : AppCompatActivity() {
     private lateinit var binding : ActivityExamBinding
 
     private lateinit var myWebView: WebView
+    private lateinit var progressDialog: ProgressDialog
+
     private var countdownTimer: CountDownTimer? = null
     private var isTimerRunning = false
     private var remainingTimeInMillis: Long = 0
     private val countdownDurationInMillis: Long = 60000 // 1 minute
-    private lateinit var progressDialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,6 +69,7 @@ class ExamActivity : AppCompatActivity() {
                         return if (fallbackUrl != null) {
                             webView.loadUrl(fallbackUrl)
                             progressDialog.dismiss()
+                            startCountdown()
                             true
                         } else {
                             false
@@ -121,20 +114,20 @@ class ExamActivity : AppCompatActivity() {
         }
 
     }
-
-    fun startCountdown(){
+    fun startCountdown() {
         if (!isTimerRunning) {
             countdownTimer = object : CountDownTimer(countdownDurationInMillis, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                     remainingTimeInMillis = millisUntilFinished
+                    updateCountdownText()
                 }
 
                 override fun onFinish() {
                     isTimerRunning = false
                     stopCountdown()
-                    updateCountdownText()
                 }
             }
+
             countdownTimer?.start()
             isTimerRunning = true
         }
@@ -145,11 +138,11 @@ class ExamActivity : AppCompatActivity() {
         isTimerRunning = false
 
         AlertDialog.Builder(this)
-            .setTitle("Waktu Sudah Habis !")
-            .setMessage("Silakan keluar dari ujian")
+            .setTitle("Perhatian !")
+            .setMessage("Wwaktu Habis Silakan Keluar Aplikasi ?")
             .setPositiveButton("Ya"){ dialogInterface: DialogInterface, i: Int ->
                 startActivity(Intent(this, InputTokenActivity::class.java))
-                finishAndRemoveTask()
+                finish()
                 dialogInterface.dismiss()
             }
             .show()
@@ -159,13 +152,6 @@ class ExamActivity : AppCompatActivity() {
         val minutes = TimeUnit.MILLISECONDS.toMinutes(remainingTimeInMillis)
         val seconds = TimeUnit.MILLISECONDS.toSeconds(remainingTimeInMillis - TimeUnit.MINUTES.toMillis(minutes))
         binding.tvTimer.text = String.format("%02d:%02d", minutes, seconds)
-    }
-
-    private fun turnedOfNotification() {
-        val intent = Intent()
-        intent.action = "android.settings.APP_NOTIFICATION_SETTINGS"
-        intent.putExtra("android.provider.extra.APP_PACKAGE", packageName)
-        startActivity(intent)
     }
 
     @Deprecated("Deprecated in Java")
