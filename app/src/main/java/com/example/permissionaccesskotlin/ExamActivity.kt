@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.PowerManager
 import android.provider.Settings
 import android.view.KeyEvent
 import android.view.View
@@ -32,6 +33,9 @@ class ExamActivity : AppCompatActivity() {
     private lateinit var myWebView: WebView
     private lateinit var progressDialog: ProgressDialog
 
+    private lateinit var powerManager: PowerManager
+    private lateinit var wakeLock: PowerManager.WakeLock
+
     private var countdownTimer: CountDownTimer? = null
     private var isTimerRunning = false
     private var remainingTimeInMillis: Long = 0
@@ -50,6 +54,15 @@ class ExamActivity : AppCompatActivity() {
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
                         View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 )
+
+        powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        wakeLock = powerManager.newWakeLock(
+            PowerManager.PARTIAL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+            "MyApp::MyWakeLockTag"
+        )
+
+        // Menonaktifkan layar
+        wakeLock.acquire()
 
         val dialog = AlertDialog.Builder(this)
             .setTitle("Perhatian !")
@@ -227,6 +240,9 @@ class ExamActivity : AppCompatActivity() {
                 startActivity(Intent(this, InputTokenActivity::class.java))
                 finishAndRemoveTask()
                 notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL)
+                if (wakeLock.isHeld) {
+                    wakeLock.release()
+                }
                 dialogInterface.dismiss()
                 dialog.dismiss()
             }
