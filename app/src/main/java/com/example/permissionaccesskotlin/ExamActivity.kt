@@ -1,5 +1,6 @@
 package com.example.permissionaccesskotlin
 
+import android.annotation.SuppressLint
 import android.app.NotificationManager
 import android.app.ProgressDialog
 import android.content.Context
@@ -53,12 +54,10 @@ class ExamActivity : AppCompatActivity() {
         val dialog = AlertDialog.Builder(this)
             .setTitle("Perhatian !")
             .setMessage("Notifikasi, Layar, dan lainnya akan terkunci, ingin melanjutkan ?")
-            .setPositiveButton("Ya"){ dialogInterface: DialogInterface, i: Int ->
-                startExam()
-                dndEnable()
+            .setPositiveButton("Ya"){ dialogInterface: DialogInterface, _: Int ->
                 dialogInterface.dismiss()
             }
-            .setNegativeButton("Tidak"){ dialogInterface: DialogInterface, i: Int ->
+            .setNegativeButton("Tidak"){ dialogInterface: DialogInterface, _: Int ->
                 finishAffinity()
                 dialogInterface.dismiss()
             }
@@ -69,6 +68,8 @@ class ExamActivity : AppCompatActivity() {
             val alertDialog = dialogInterface as AlertDialog
             val buttonPositive = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
             buttonPositive.setOnClickListener {
+                startExam()
+                dndEnable()
                 dialog.dismiss()
             }
         }
@@ -205,6 +206,7 @@ class ExamActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SuspiciousIndentation")
     fun stopCountdown() {
         countdownTimer?.cancel()
         isTimerRunning = false
@@ -213,9 +215,6 @@ class ExamActivity : AppCompatActivity() {
             .setTitle("Perhatian !")
             .setMessage("Waktu Habis Silakan Keluar Aplikasi ?")
             .setPositiveButton("Ya"){ dialogInterface: DialogInterface, _: Int ->
-                startActivity(Intent(this, InputTokenActivity::class.java))
-                finishAndRemoveTask()
-                notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL)
                 dialogInterface.dismiss()
             }
             .setCancelable(false)
@@ -225,6 +224,10 @@ class ExamActivity : AppCompatActivity() {
             val alertDialog = dialogInterface as AlertDialog
             val buttonPositive = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
             buttonPositive.setOnClickListener {
+                startActivity(Intent(this, InputTokenActivity::class.java))
+                finishAndRemoveTask()
+                notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL)
+                dialogInterface.dismiss()
                 dialog.dismiss()
             }
         }
