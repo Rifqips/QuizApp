@@ -96,7 +96,6 @@ class ExamActivity : AppCompatActivity() {
                 if (checkOnOff) {
                     checkOnOff = false
                     // DND off
-                    stopCountdown()
                     notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL)
                 } else {
                     checkOnOff = true
@@ -206,7 +205,7 @@ class ExamActivity : AppCompatActivity() {
             .setPositiveButton("Ya"){ dialogInterface: DialogInterface, _: Int ->
                 startActivity(Intent(this, InputTokenActivity::class.java))
                 finishAndRemoveTask()
-                dndEnable()
+                notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL)
                 dialogInterface.dismiss()
             }
             .show()
