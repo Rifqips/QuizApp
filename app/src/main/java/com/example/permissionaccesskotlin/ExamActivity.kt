@@ -50,7 +50,7 @@ class ExamActivity : AppCompatActivity() {
                         View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 )
 
-        AlertDialog.Builder(this)
+        val dialog = AlertDialog.Builder(this)
             .setTitle("Perhatian !")
             .setMessage("Notifikasi, Layar, dan lainnya akan terkunci, ingin melanjutkan ?")
             .setPositiveButton("Ya"){ dialogInterface: DialogInterface, i: Int ->
@@ -62,7 +62,17 @@ class ExamActivity : AppCompatActivity() {
                 finishAffinity()
                 dialogInterface.dismiss()
             }
-            .show()
+            .setCancelable(false)
+            .create()
+
+        dialog.setOnShowListener { dialogInterface ->
+            val alertDialog = dialogInterface as AlertDialog
+            val buttonPositive = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+            buttonPositive.setOnClickListener {
+                dialog.dismiss()
+            }
+        }
+        dialog.show()
 
     }
 
@@ -199,7 +209,7 @@ class ExamActivity : AppCompatActivity() {
         countdownTimer?.cancel()
         isTimerRunning = false
 
-        AlertDialog.Builder(this)
+        val dialog = AlertDialog.Builder(this)
             .setTitle("Perhatian !")
             .setMessage("Waktu Habis Silakan Keluar Aplikasi ?")
             .setPositiveButton("Ya"){ dialogInterface: DialogInterface, _: Int ->
@@ -208,7 +218,17 @@ class ExamActivity : AppCompatActivity() {
                 notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL)
                 dialogInterface.dismiss()
             }
-            .show()
+            .setCancelable(false)
+            .create()
+
+             dialog.setOnShowListener { dialogInterface ->
+            val alertDialog = dialogInterface as AlertDialog
+            val buttonPositive = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+            buttonPositive.setOnClickListener {
+                dialog.dismiss()
+            }
+        }
+                dialog.show()
     }
 
     private fun updateCountdownText() {
